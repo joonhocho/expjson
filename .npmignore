@@ -244,4 +244,17 @@ vcs.xml
 xcuserdata/
 # End
 
-lib
+# Additional to .gitignore
+!dist/
+!out/
+*.config.js
+*.config.ts
+*.md
+.*ignore
+.*rc
+.gitignore
+.travis.yml
+now*.json
+src
+tsconfig*.json
+tslint.json
