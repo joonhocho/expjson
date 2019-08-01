@@ -53,3 +53,7 @@ export const In: In = 'In';
 
 export type NotIn = '!In';
 export const NotIn: NotIn = '!In';
+
+// Variable
+export type Var = '$';
+export const Var: Var = '$';

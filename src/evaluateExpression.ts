@@ -1,4 +1,4 @@
-import { isExpression, variablePattern } from './common';
+import { isExpression } from './common';
 import {
   Add,
   And,
@@ -17,27 +17,15 @@ import {
   NotIn,
   Or,
   Subtract,
+  Var,
 } from './operator';
 import { ExecutionContext, Expression, Value, Value4 } from './ts';
 
 export const evaluateOperand = (
   operand: Value4,
   context: ExecutionContext
-): Value => {
-  if (isExpression(operand)) {
-    return evaluateExpression(operand, context);
-  }
-  if (typeof operand === 'string') {
-    if (variablePattern.test(operand)) {
-      return context[operand.substring(1)];
-    }
-    if (operand.lastIndexOf('\\$', 0) === 0) {
-      // escape \$
-      return operand.substring(1);
-    }
-  }
-  return operand;
-};
+): Value =>
+  isExpression(operand) ? evaluateExpression(operand, context) : operand;
 
 export const evaluateExpression = (
   exp: Expression,
@@ -163,9 +151,9 @@ export const evaluateExpression = (
     case In: {
       const v = evaluateOperand(exp[1], context);
       const exps = exp[2];
-      if (typeof exps === 'string') {
+      if (isExpression(exps)) {
         // variable of array
-        const vs = evaluateOperand(exps, context);
+        const vs = evaluateExpression(exps, context);
         if (Array.isArray(vs)) {
           for (let i = 0, len = vs.length; i < len; i += 1) {
             if (v === vs[i]) {
@@ -185,9 +173,9 @@ export const evaluateExpression = (
     case NotIn: {
       const v = evaluateOperand(exp[1], context);
       const exps = exp[2];
-      if (typeof exps === 'string') {
+      if (isExpression(exps)) {
         // variable of array
-        const vs = evaluateOperand(exps, context);
+        const vs = evaluateExpression(exps, context);
         if (Array.isArray(vs)) {
           for (let i = 0, len = vs.length; i < len; i += 1) {
             if (v === vs[i]) {
@@ -203,6 +191,9 @@ export const evaluateExpression = (
         }
       }
       return true;
+    }
+    case Var: {
+      return context[exp[1]];
     }
   }
 };

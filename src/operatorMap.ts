@@ -26,6 +26,8 @@ export const OperatorToName: {
   // Set
   In: 'In';
   '!In': 'NotIn';
+  // Variable
+  $: 'Var';
 } = {} as any;
 
 Object.keys(Operators).forEach((name: any) => {

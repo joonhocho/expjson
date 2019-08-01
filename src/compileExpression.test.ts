@@ -18,6 +18,7 @@ import {
   NotIn,
   Or,
   Subtract,
+  Var,
 } from './operator';
 
 test('compileExpression', () => {
@@ -30,7 +31,7 @@ test('compileExpression', () => {
 
 test.skip('benchmark', () => {
   const t1 = Date.now();
-  const exp = [And, false, [In, '$a', ['b', 'c']]];
+  const exp = [And, false, [In, [Var, 'a'], ['b', 'c']]];
   for (let i = 0; i < 1000000; i += 1) {
     compileExpression(exp as any)(null as any);
   }
@@ -186,54 +187,66 @@ test('Recursive Expression', () => {
 
 test('context', () => {
   expect(compileExpression([In, 'a', ['b', 'c']])({})).toBe(false);
-  expect(compileExpression([In, '$a', ['b', 'c']])({})).toBe(false);
-  expect(compileExpression([In, '$a', ['b', 'c']])({ a: 'a' })).toBe(false);
-  expect(compileExpression([In, '$a', ['b', 'c']])({ a: 'b' })).toBe(true);
-  expect(compileExpression([In, '$a', ['b', 'c']])({ a: 'c' })).toBe(true);
-  expect(compileExpression([In, '$a', ['b', 'c']])({ a: 'd' })).toBe(false);
-  expect(compileExpression([In, '$a', ['$b', 'c']])({ a: 'd', b: 'd' })).toBe(
+  expect(compileExpression([In, [Var, 'a'], ['b', 'c']])({})).toBe(false);
+  expect(compileExpression([In, [Var, 'a'], ['b', 'c']])({ a: 'a' })).toBe(
+    false
+  );
+  expect(compileExpression([In, [Var, 'a'], ['b', 'c']])({ a: 'b' })).toBe(
     true
   );
+  expect(compileExpression([In, [Var, 'a'], ['b', 'c']])({ a: 'c' })).toBe(
+    true
+  );
+  expect(compileExpression([In, [Var, 'a'], ['b', 'c']])({ a: 'd' })).toBe(
+    false
+  );
+  expect(
+    compileExpression([In, [Var, 'a'], [[Var, 'b'], 'c']])({ a: 'd', b: 'd' })
+  ).toBe(true);
 });
 
 test('escape $', () => {
-  expect(compileExpression([IfThenElse, 1, '\\$a', null])({})).toBe('$a');
+  expect(compileExpression([IfThenElse, 1, '$a', null])({})).toBe('$a');
 });
 
 test('complex', () => {
+  const compiled1 = compileExpression([
+    IfThenElse, // same as '?:'
+    [In, 'admin', [Var, 'roles']], // test if "admin" is in "roles" context variable
+    [Not, [Var, 'postDeleted']], // true if context variable "postDeleted" is false
+    [Var, 'unauthorized'], // context variable "unauthorized"
+  ]);
+
   expect(
-    compileExpression([
-      IfThenElse, // same as '?:'
-      [In, 'admin', '$roles'], // test if "admin" is in "roles" context variable
-      [Not, '$postDeleted'], // true if context variable "postDeleted" is false
-      '$unauthorized', // context variable "unauthorized"
-    ])({
+    compiled1({
       postDeleted: false,
       roles: ['user', 'admin'],
       unauthorized: 'Unauthorized Error',
     })
   ).toBe(true);
 
+  const compiled2 = compileExpression([
+    '?:', // same as IfThenElse
+    ['In', 'admin', [Var, 'roles']], // test if "admin" is in "roles" context variable
+    ['!', [Var, 'postDeleted']], // true if context variable "postDeleted" is false
+    [Var, 'unauthorized'], // context variable "unauthorized"
+  ]);
   expect(
-    compileExpression([
-      '?:', // same as IfThenElse
-      ['In', 'admin', '$roles'], // test if "admin" is in "roles" context variable
-      ['!', '$postDeleted'], // true if context variable "postDeleted" is false
-      '$unauthorized', // context variable "unauthorized"
-    ])({
+    compiled2({
       postDeleted: true,
       roles: ['user', 'admin'],
       unauthorized: 'Unauthorized Error',
     })
   ).toBe(false);
 
+  const compiled3 = compileExpression([
+    IfThenElse, // same as '?:'
+    [In, 'admin', [Var, 'roles']], // test if "admin" is in "roles" context variable
+    [Not, [Var, 'postDeleted']], // true if context variable "postDeleted" is false
+    [Var, 'unauthorized'], // context variable "unauthorized"
+  ]);
   expect(
-    compileExpression([
-      IfThenElse, // same as '?:'
-      [In, 'admin', '$roles'], // test if "admin" is in "roles" context variable
-      [Not, '$postDeleted'], // true if context variable "postDeleted" is false
-      '$unauthorized', // context variable "unauthorized"
-    ])({
+    compiled3({
       postDeleted: false,
       roles: ['user', 'guest'],
       unauthorized: 'Unauthorized Error',

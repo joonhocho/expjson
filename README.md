@@ -25,96 +25,121 @@ yarn add -D expjson
 functionalities are exactly same for both.
 
 ```typescript
-import { compileExpression, evaluateExpression, IfThenElse, In, Not } from 'expjson';
+import {
+  compileExpression,
+  evaluateExpression,
+  // operators
+  Add,
+  And,
+  Divide,
+  Equal,
+  GreaterThan,
+  GreaterThanOrEqual,
+  IfThenElse,
+  In,
+  LessThan,
+  LessThanOrEqual,
+  Modulo,
+  Multiply,
+  Not,
+  NotEqual,
+  NotIn,
+  Or,
+  Subtract,
+  Var,
+} from 'expjson';
 
+// evaluateExpression: evaluate without compile
+expect(
+  evaluateExpression(
+    [
+      IfThenElse, // same as '?:'
+      [In, 'admin', [Var, 'roles']], // test if "admin" is in "roles" context variable
+      [Not, [Var, 'postDeleted']], // true if context variable "postDeleted" is false
+      [Var, 'unauthorized'], // context variable "unauthorized"
+    ],
+    {
+      postDeleted: false,
+      roles: ['user', 'admin'],
+      unauthorized: 'Unauthorized Error',
+    }
+  )
+).toBe(true);
 
-evaluateExpression(
-  // expression to evaluate
-  [
-    IfThenElse, // same as '?:'
-    [In, 'admin', '$roles'], // test if "admin" is in "roles" context variable
-    [Not, '$postDeleted'], // true if context variable "postDeleted" is false
-    '$unauthorized', // context variable "unauthorized"
-  ],
-  // execution context
-  {
-    postDeleted: false,
-    roles: ['user', 'admin'],
-    unauthorized: 'Unauthorized Error',
-  }
-) === true
+expect(
+  evaluateExpression(
+    [
+      '?:', // same as IfThenElse
+      ['In', 'admin', [Var, 'roles']], // test if "admin" is in "roles" context variable
+      ['!', [Var, 'postDeleted']], // true if context variable "postDeleted" is false
+      [Var, 'unauthorized'], // context variable "unauthorized"
+    ],
+    {
+      postDeleted: true,
+      roles: ['user', 'admin'],
+      unauthorized: 'Unauthorized Error',
+    }
+  )
+).toBe(false);
 
+expect(
+  evaluateExpression(
+    [
+      IfThenElse, // same as '?:'
+      [In, 'admin', [Var, 'roles']], // test if "admin" is in "roles" context variable
+      [Not, [Var, 'postDeleted']], // true if context variable "postDeleted" is false
+      [Var, 'unauthorized'], // context variable "unauthorized"
+    ],
+    {
+      postDeleted: false,
+      roles: ['user', 'guest'],
+      unauthorized: 'Unauthorized Error',
+    }
+  )
+).toBe('Unauthorized Error');
 
-evaluateExpression(
-  [
-    '?:', // same as IfThenElse
-    ['In', 'admin', '$roles'], // test if "admin" is in "roles" context variable
-    ['!', '$postDeleted'], // true if context variable "postDeleted" is false
-    '$unauthorized', // context variable "unauthorized"
-  ],
-  {
-    postDeleted: true,
-    roles: ['user', 'admin'],
-    unauthorized: 'Unauthorized Error',
-  }
-) === false
-
-
-evaluateExpression(
-  [
-    IfThenElse, // same as '?:'
-    [In, 'admin', '$roles'], // test if "admin" is in "roles" context variable
-    [Not, '$postDeleted'], // true if context variable "postDeleted" is false
-    '$unauthorized', // context variable "unauthorized"
-  ],
-  {
-    postDeleted: false,
-    roles: ['user', 'guest'],
-    unauthorized: 'Unauthorized Error',
-  }
-) === 'Unauthorized Error'
-
-
+// compileExpression: compile then evaluate
 const compiled1 = compileExpression([
   IfThenElse, // same as '?:'
-  [In, 'admin', '$roles'], // test if "admin" is in "roles" context variable
-  [Not, '$postDeleted'], // true if context variable "postDeleted" is false
-  '$unauthorized', // context variable "unauthorized"
+  [In, 'admin', [Var, 'roles']], // test if "admin" is in "roles" context variable
+  [Not, [Var, 'postDeleted']], // true if context variable "postDeleted" is false
+  [Var, 'unauthorized'], // context variable "unauthorized"
 ]);
-
-compiled1({
-  postDeleted: false,
-  roles: ['user', 'admin'],
-  unauthorized: 'Unauthorized Error',
-}) === true
-
+expect(
+  compiled1({
+    postDeleted: false,
+    roles: ['user', 'admin'],
+    unauthorized: 'Unauthorized Error',
+  })
+).toBe(true);
 
 const compiled2 = compileExpression([
   '?:', // same as IfThenElse
-  ['In', 'admin', '$roles'], // test if "admin" is in "roles" context variable
-  ['!', '$postDeleted'], // true if context variable "postDeleted" is false
-  '$unauthorized', // context variable "unauthorized"
+  ['In', 'admin', [Var, 'roles']], // test if "admin" is in "roles" context variable
+  ['!', [Var, 'postDeleted']], // true if context variable "postDeleted" is false
+  [Var, 'unauthorized'], // context variable "unauthorized"
 ]);
-
-compiled2({
-  postDeleted: true,
-  roles: ['user', 'admin'],
-  unauthorized: 'Unauthorized Error',
-}) === false
-
+expect(
+  compiled2({
+    postDeleted: true,
+    roles: ['user', 'admin'],
+    unauthorized: 'Unauthorized Error',
+  })
+).toBe(false);
 
 const compiled3 = compileExpression([
   IfThenElse, // same as '?:'
-  [In, 'admin', '$roles'], // test if "admin" is in "roles" context variable
-  [Not, '$postDeleted'], // true if context variable "postDeleted" is false
-  '$unauthorized', // context variable "unauthorized"
+  [In, 'admin', [Var, 'roles']], // test if "admin" is in "roles" context variable
+  [Not, [Var, 'postDeleted']], // true if context variable "postDeleted" is false
+  [Var, 'unauthorized'], // context variable "unauthorized"
 ]);
-
-compiled3({
-  postDeleted: false,
-  roles: ['user', 'guest'],
-  unauthorized: 'Unauthorized Error',
-}) === 'Unauthorized Error'
+expect(
+  compiled3({
+    postDeleted: false,
+    roles: ['user', 'guest'],
+    unauthorized: 'Unauthorized Error',
+  })
+).toBe('Unauthorized Error');
 ```
 
 ## License

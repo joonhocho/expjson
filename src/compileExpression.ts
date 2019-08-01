@@ -1,4 +1,4 @@
-import { isExpression, variablePattern } from './common';
+import { isExpression } from './common';
 import {
   Add,
   And,
@@ -17,28 +17,14 @@ import {
   NotIn,
   Or,
   Subtract,
+  Var,
 } from './operator';
 import { ExecutionContext, Expression, Value, Value4 } from './ts';
 
 export type EvaluateExpression = (context: ExecutionContext) => Value;
 
-export const compileOperand = (operand: Value4): EvaluateExpression => {
-  if (isExpression(operand)) {
-    return compileExpression(operand);
-  }
-  if (typeof operand === 'string') {
-    if (variablePattern.test(operand)) {
-      const name = operand.substring(1);
-      return (context: ExecutionContext): Value => context[name];
-    }
-    if (operand.lastIndexOf('\\$', 0) === 0) {
-      // escape \$
-      const unescaped = operand.substring(1);
-      return (): Value => unescaped;
-    }
-  }
-  return (): Value => operand;
-};
+export const compileOperand = (operand: Value4): EvaluateExpression =>
+  isExpression(operand) ? compileExpression(operand) : (): Value => operand;
 
 export const compileExpression = (exp: Expression): EvaluateExpression => {
   switch (exp[0]) {
@@ -208,9 +194,9 @@ export const compileExpression = (exp: Expression): EvaluateExpression => {
     case In: {
       const getV = compileOperand(exp[1]);
       const exps = exp[2];
-      if (typeof exps === 'string') {
+      if (isExpression(exps)) {
         // variable of array
-        const getValues = compileOperand(exps);
+        const getValues = compileExpression(exps);
         return (context: ExecutionContext): boolean => {
           const v = getV(context);
           const vs = getValues(context);
@@ -241,6 +227,10 @@ export const compileExpression = (exp: Expression): EvaluateExpression => {
       newExp[0] = In;
       const getIn = compileExpression(newExp as any);
       return (context: ExecutionContext): boolean => !getIn(context);
+    }
+    case Var: {
+      const name = exp[1];
+      return (context: ExecutionContext): Value => context[name];
     }
   }
 };

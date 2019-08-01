@@ -16,6 +16,7 @@ import {
   NotIn,
   Or,
   Subtract,
+  Var,
 } from './operator';
 
 export type Value =
@@ -46,8 +47,10 @@ export type Expression1 =
   // Conditional
   | [IfThenElse, Value, Value, Value]
   // Set
-  | [In, Value, string | Value[]]
-  | [NotIn, Value, string | Value[]];
+  | [In, Value, Value[]]
+  | [NotIn, Value, Value[]]
+  // Value
+  | [Var, string];
 
 export type Value2 = Value | Expression1;
 
@@ -72,8 +75,10 @@ export type Expression2 =
   // Conditional
   | [IfThenElse, Value2, Value2, Value2]
   // Set
-  | [In, Value2, string | Value2[]]
-  | [NotIn, Value2, string | Value2[]];
+  | [In, Value2, Value2[]]
+  | [NotIn, Value2, Value2[]]
+  // Value
+  | [Var, string];
 
 export type Value3 = Value | Expression1 | Value2 | Expression2;
 
@@ -98,8 +103,10 @@ export type Expression3 =
   // Conditional
   | [IfThenElse, Value3, Value3, Value3]
   // Set
-  | [In, Value3, string | Value3[]]
-  | [NotIn, Value3, string | Value3[]];
+  | [In, Value3, Value3[]]
+  | [NotIn, Value3, Value3[]]
+  // Value
+  | [Var, string];
 
 export type Value4 =
   | Value
@@ -130,8 +137,10 @@ export type Expression =
   // Conditional
   | [IfThenElse, Value4, Value4, Value4]
   // Set
-  | [In, Value4, string | Value4[]]
-  | [NotIn, Value4, string | Value4[]];
+  | [In, Value4, Value4[]]
+  | [NotIn, Value4, Value4[]]
+  // Value
+  | [Var, string];
 
 // tslint:disable-next-line interface-name
 export interface ExecutionContext {

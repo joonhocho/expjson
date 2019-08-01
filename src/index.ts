@@ -1,4 +1,4 @@
-export { isExpression, isOperator, variablePattern } from './common';
+export { isExpression, isOperator } from './common';
 export {
   EvaluateExpression,
   compileExpression,
@@ -23,6 +23,7 @@ export {
   NotIn,
   Or,
   Subtract,
+  Var,
 } from './operator';
 export { Operator, OperatorName, OperatorToName } from './operatorMap';
 export {

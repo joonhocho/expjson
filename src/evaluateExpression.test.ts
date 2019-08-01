@@ -18,6 +18,7 @@ import {
   NotIn,
   Or,
   Subtract,
+  Var,
 } from './operator';
 
 test('evaluateExpression', () => {
@@ -30,7 +31,7 @@ test('evaluateExpression', () => {
 
 test.skip('benchmark', () => {
   const t1 = Date.now();
-  const exp = [And, false, [In, '$a', ['b', 'c']]];
+  const exp = [And, false, [In, [Var, 'a'], ['b', 'c']]];
   for (let i = 0; i < 1000000; i += 1) {
     evaluateExpression(exp as any, null as any);
   }
@@ -181,18 +182,26 @@ test('Recursive Expression', () => {
 
 test('context', () => {
   expect(evaluateExpression([In, 'a', ['b', 'c']], {})).toBe(false);
-  expect(evaluateExpression([In, '$a', ['b', 'c']], {})).toBe(false);
-  expect(evaluateExpression([In, '$a', ['b', 'c']], { a: 'a' })).toBe(false);
-  expect(evaluateExpression([In, '$a', ['b', 'c']], { a: 'b' })).toBe(true);
-  expect(evaluateExpression([In, '$a', ['b', 'c']], { a: 'c' })).toBe(true);
-  expect(evaluateExpression([In, '$a', ['b', 'c']], { a: 'd' })).toBe(false);
-  expect(evaluateExpression([In, '$a', ['$b', 'c']], { a: 'd', b: 'd' })).toBe(
+  expect(evaluateExpression([In, [Var, 'a'], ['b', 'c']], {})).toBe(false);
+  expect(evaluateExpression([In, [Var, 'a'], ['b', 'c']], { a: 'a' })).toBe(
+    false
+  );
+  expect(evaluateExpression([In, [Var, 'a'], ['b', 'c']], { a: 'b' })).toBe(
     true
   );
+  expect(evaluateExpression([In, [Var, 'a'], ['b', 'c']], { a: 'c' })).toBe(
+    true
+  );
+  expect(evaluateExpression([In, [Var, 'a'], ['b', 'c']], { a: 'd' })).toBe(
+    false
+  );
+  expect(
+    evaluateExpression([In, [Var, 'a'], [[Var, 'b'], 'c']], { a: 'd', b: 'd' })
+  ).toBe(true);
 });
 
 test('escape $', () => {
-  expect(evaluateExpression([IfThenElse, 1, '\\$a', null], {})).toBe('$a');
+  expect(evaluateExpression([IfThenElse, 1, '$a', null], {})).toBe('$a');
 });
 
 test('complex', () => {
@@ -200,9 +209,9 @@ test('complex', () => {
     evaluateExpression(
       [
         IfThenElse, // same as '?:'
-        [In, 'admin', '$roles'], // test if "admin" is in "roles" context variable
-        [Not, '$postDeleted'], // true if context variable "postDeleted" is false
-        '$unauthorized', // context variable "unauthorized"
+        [In, 'admin', [Var, 'roles']], // test if "admin" is in "roles" context variable
+        [Not, [Var, 'postDeleted']], // true if context variable "postDeleted" is false
+        [Var, 'unauthorized'], // context variable "unauthorized"
       ],
       {
         postDeleted: false,
@@ -216,9 +225,9 @@ test('complex', () => {
     evaluateExpression(
       [
         '?:', // same as IfThenElse
-        ['In', 'admin', '$roles'], // test if "admin" is in "roles" context variable
-        ['!', '$postDeleted'], // true if context variable "postDeleted" is false
-        '$unauthorized', // context variable "unauthorized"
+        ['In', 'admin', [Var, 'roles']], // test if "admin" is in "roles" context variable
+        ['!', [Var, 'postDeleted']], // true if context variable "postDeleted" is false
+        [Var, 'unauthorized'], // context variable "unauthorized"
       ],
       {
         postDeleted: true,
@@ -232,9 +241,9 @@ test('complex', () => {
     evaluateExpression(
       [
         IfThenElse, // same as '?:'
-        [In, 'admin', '$roles'], // test if "admin" is in "roles" context variable
-        [Not, '$postDeleted'], // true if context variable "postDeleted" is false
-        '$unauthorized', // context variable "unauthorized"
+        [In, 'admin', [Var, 'roles']], // test if "admin" is in "roles" context variable
+        [Not, [Var, 'postDeleted']], // true if context variable "postDeleted" is false
+        [Var, 'unauthorized'], // context variable "unauthorized"
       ],
       {
         postDeleted: false,
