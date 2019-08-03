@@ -44,6 +44,33 @@ test.skip('benchmark', () => {
   console.log(t3 - t2, t2 - t1, (t2 - t1) / (t3 - t2));
 });
 
+test.skip('benchmark vs code', () => {
+  const exp = compileExpression([Not, [In, [Var, 'value'], ['a', 'b']]]);
+  let r1 = null;
+  let r2 = null;
+  const value = 'c' as string;
+  const n = 1000000;
+
+  const t1 = Date.now();
+  for (let i = 0; i < n; i += 1) {
+    r1 = exp({ value }) as any;
+  }
+
+  const t2 = Date.now();
+  for (let i = 0; i < n; i += 1) {
+    r2 = !(value === 'a' || value === 'b');
+  }
+  const t3 = Date.now();
+  console.log(
+    'b',
+    `${(t2 - t1) / n}ms`,
+    `${(t3 - t2) / n}ms`,
+    (t2 - t1) / (t3 - t2),
+    r1,
+    r2
+  );
+});
+
 test('Equal', () => {
   expect(compileExpression([Equal, 1, 1])({})).toBe(true);
   expect(compileExpression(['==' as any, 1, 1])({})).toBe(true);
