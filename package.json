@@ -1,6 +1,6 @@
 {
   "name": "expjson",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Super lightweight, fast, and optimized evaluate-able and compilable expressions in JSON written in TypeScript",
   "keywords": [
     "lightweight",
