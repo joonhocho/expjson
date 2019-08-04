@@ -279,4 +279,12 @@ test('complex', () => {
       unauthorized: 'Unauthorized Error',
     })
   ).toBe('Unauthorized Error');
+
+  expect(
+    compileExpression([Var, 'post', 'user', 'deleted'])({
+      post: { user: { deleted: true } },
+    })
+  ).toBe(true);
+
+  expect(compileExpression([Var, 'post', 'user', 'deleted'])({})).toBe(null);
 });

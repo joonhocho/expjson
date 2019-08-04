@@ -19,31 +19,35 @@ import {
   Subtract,
   Var,
 } from './operator';
-import { ExecutionContext, Expression, Value, Value4 } from './ts';
+import { ExecutionContext, Expression, Value, Value3 } from './ts';
 
-export type EvaluateExpression = (context: ExecutionContext) => Value;
+export type EvaluateExpression<
+  Context extends ExecutionContext = ExecutionContext
+> = (context: Context) => Value;
 
-export const compileOperand = (operand: Value4): EvaluateExpression =>
+export const compileOperand = (operand: Value3): EvaluateExpression =>
   isExpression(operand) ? compileExpression(operand) : (): Value => operand;
 
-export const compileExpression = (exp: Expression): EvaluateExpression => {
+export const compileExpression = <
+  Context extends ExecutionContext = ExecutionContext
+>(
+  exp: Expression
+): EvaluateExpression<Context> => {
   switch (exp[0]) {
     case Equal: {
       const getV1 = compileOperand(exp[1]);
       const getV2 = compileOperand(exp[2]);
-      return (context: ExecutionContext): boolean =>
-        getV1(context) === getV2(context);
+      return (context: Context): boolean => getV1(context) === getV2(context);
     }
     case NotEqual: {
       const getV1 = compileOperand(exp[1]);
       const getV2 = compileOperand(exp[2]);
-      return (context: ExecutionContext): boolean =>
-        getV1(context) !== getV2(context);
+      return (context: Context): boolean => getV1(context) !== getV2(context);
     }
     case GreaterThan: {
       const getV1 = compileOperand(exp[1]);
       const getV2 = compileOperand(exp[2]);
-      return (context: ExecutionContext): boolean => {
+      return (context: Context): boolean => {
         const v1 = getV1(context);
         if (typeof v1 === 'number' && !isNaN(v1)) {
           const v2 = getV2(context);
@@ -55,7 +59,7 @@ export const compileExpression = (exp: Expression): EvaluateExpression => {
     case GreaterThanOrEqual: {
       const getV1 = compileOperand(exp[1]);
       const getV2 = compileOperand(exp[2]);
-      return (context: ExecutionContext): boolean => {
+      return (context: Context): boolean => {
         const v1 = getV1(context);
         if (typeof v1 === 'number' && !isNaN(v1)) {
           const v2 = getV2(context);
@@ -67,7 +71,7 @@ export const compileExpression = (exp: Expression): EvaluateExpression => {
     case LessThan: {
       const getV1 = compileOperand(exp[1]);
       const getV2 = compileOperand(exp[2]);
-      return (context: ExecutionContext): boolean => {
+      return (context: Context): boolean => {
         const v1 = getV1(context);
         if (typeof v1 === 'number' && !isNaN(v1)) {
           const v2 = getV2(context);
@@ -79,7 +83,7 @@ export const compileExpression = (exp: Expression): EvaluateExpression => {
     case LessThanOrEqual: {
       const getV1 = compileOperand(exp[1]);
       const getV2 = compileOperand(exp[2]);
-      return (context: ExecutionContext): boolean => {
+      return (context: Context): boolean => {
         const v1 = getV1(context);
         if (typeof v1 === 'number' && !isNaN(v1)) {
           const v2 = getV2(context);
@@ -91,7 +95,7 @@ export const compileExpression = (exp: Expression): EvaluateExpression => {
     case Add: {
       const getV1 = compileOperand(exp[1]);
       const getV2 = compileOperand(exp[2]);
-      return (context: ExecutionContext): number => {
+      return (context: Context): number => {
         const v1 = getV1(context);
         if (typeof v1 === 'number' && !isNaN(v1)) {
           const v2 = getV2(context);
@@ -105,7 +109,7 @@ export const compileExpression = (exp: Expression): EvaluateExpression => {
     case Subtract: {
       const getV1 = compileOperand(exp[1]);
       const getV2 = compileOperand(exp[2]);
-      return (context: ExecutionContext): number => {
+      return (context: Context): number => {
         const v1 = getV1(context);
         if (typeof v1 === 'number' && !isNaN(v1)) {
           const v2 = getV2(context);
@@ -119,7 +123,7 @@ export const compileExpression = (exp: Expression): EvaluateExpression => {
     case Multiply: {
       const getV1 = compileOperand(exp[1]);
       const getV2 = compileOperand(exp[2]);
-      return (context: ExecutionContext): number => {
+      return (context: Context): number => {
         const v1 = getV1(context);
         if (typeof v1 === 'number' && !isNaN(v1)) {
           const v2 = getV2(context);
@@ -133,7 +137,7 @@ export const compileExpression = (exp: Expression): EvaluateExpression => {
     case Divide: {
       const getV1 = compileOperand(exp[1]);
       const getV2 = compileOperand(exp[2]);
-      return (context: ExecutionContext): number => {
+      return (context: Context): number => {
         const v1 = getV1(context);
         if (typeof v1 === 'number' && !isNaN(v1)) {
           const v2 = getV2(context);
@@ -147,7 +151,7 @@ export const compileExpression = (exp: Expression): EvaluateExpression => {
     case Modulo: {
       const getV1 = compileOperand(exp[1]);
       const getV2 = compileOperand(exp[2]);
-      return (context: ExecutionContext): number => {
+      return (context: Context): number => {
         const v1 = getV1(context);
         if (typeof v1 === 'number' && !isNaN(v1)) {
           const v2 = getV2(context);
@@ -160,11 +164,11 @@ export const compileExpression = (exp: Expression): EvaluateExpression => {
     }
     case Not: {
       const getV1 = compileOperand(exp[1]);
-      return (context: ExecutionContext): boolean => !getV1(context);
+      return (context: Context): boolean => !getV1(context);
     }
     case And: {
       const getters = exp.slice(1).map(compileOperand);
-      return (context: ExecutionContext): boolean => {
+      return (context: Context): boolean => {
         for (let i = 0, len = getters.length; i < len; i += 1) {
           if (!getters[i](context)) {
             return false;
@@ -175,7 +179,7 @@ export const compileExpression = (exp: Expression): EvaluateExpression => {
     }
     case Or: {
       const getters = exp.slice(1).map(compileOperand);
-      return (context: ExecutionContext): boolean => {
+      return (context: Context): boolean => {
         for (let i = 0, len = getters.length; i < len; i += 1) {
           if (getters[i](context)) {
             return true;
@@ -188,7 +192,7 @@ export const compileExpression = (exp: Expression): EvaluateExpression => {
       const getV1 = compileOperand(exp[1]);
       const getV2 = compileOperand(exp[2]);
       const getV3 = compileOperand(exp[3]);
-      return (context: ExecutionContext): Value =>
+      return (context: Context): Value =>
         getV1(context) ? getV2(context) : getV3(context);
     }
     case In: {
@@ -197,7 +201,7 @@ export const compileExpression = (exp: Expression): EvaluateExpression => {
       if (isExpression(exps)) {
         // variable of array
         const getValues = compileExpression(exps);
-        return (context: ExecutionContext): boolean => {
+        return (context: Context): boolean => {
           const v = getV(context);
           const vs = getValues(context);
           if (Array.isArray(vs)) {
@@ -211,7 +215,7 @@ export const compileExpression = (exp: Expression): EvaluateExpression => {
         };
       }
       const getters = exps.map(compileOperand);
-      return (context: ExecutionContext): boolean => {
+      return (context: Context): boolean => {
         const v = getV(context);
         for (let i = 0, len = getters.length; i < len; i += 1) {
           if (getters[i](context) === v) {
@@ -226,11 +230,22 @@ export const compileExpression = (exp: Expression): EvaluateExpression => {
       const newExp = exp.slice();
       newExp[0] = In;
       const getIn = compileExpression(newExp as any);
-      return (context: ExecutionContext): boolean => !getIn(context);
+      return (context: Context): boolean => !getIn(context);
     }
     case Var: {
       const name = exp[1];
-      return (context: ExecutionContext): Value => context[name];
+      return exp.length < 2
+        ? (context: Context): Value => context[name]
+        : (context: Context): Value => {
+            let val: any = context[name];
+            for (let i = 2, len = exp.length; i < len; i += 1) {
+              if (val == null) {
+                return null;
+              }
+              val = val[exp[i]];
+            }
+            return val;
+          };
     }
   }
 };

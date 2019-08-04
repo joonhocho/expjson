@@ -31,9 +31,7 @@ export {
   Expression,
   Expression1,
   Expression2,
-  Expression3,
   Value,
   Value2,
   Value3,
-  Value4,
 } from './ts';

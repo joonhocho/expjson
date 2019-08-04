@@ -252,4 +252,12 @@ test('complex', () => {
       }
     )
   ).toBe('Unauthorized Error');
+
+  expect(
+    evaluateExpression([Var, 'post', 'user', 'deleted'], {
+      post: { user: { deleted: true } },
+    })
+  ).toBe(true);
+
+  expect(evaluateExpression([Var, 'post', 'user', 'deleted'], {})).toBe(null);
 });

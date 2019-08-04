@@ -50,7 +50,7 @@ export type Expression1 =
   | [In, Value, Value[]]
   | [NotIn, Value, Value[]]
   // Value
-  | [Var, string];
+  | [Var, ...string[]];
 
 export type Value2 = Value | Expression1;
 
@@ -78,11 +78,11 @@ export type Expression2 =
   | [In, Value2, Value2[]]
   | [NotIn, Value2, Value2[]]
   // Value
-  | [Var, string];
+  | [Var, ...string[]];
 
 export type Value3 = Value | Expression1 | Value2 | Expression2;
 
-export type Expression3 =
+export type Expression =
   // Relational
   | [Equal, Value3, Value3]
   | [NotEqual, Value3, Value3]
@@ -106,43 +106,9 @@ export type Expression3 =
   | [In, Value3, Value3[]]
   | [NotIn, Value3, Value3[]]
   // Value
-  | [Var, string];
-
-export type Value4 =
-  | Value
-  | Expression1
-  | Value2
-  | Expression2
-  | Value3
-  | Expression3;
-
-export type Expression =
-  // Relational
-  | [Equal, Value4, Value4]
-  | [NotEqual, Value4, Value4]
-  | [GreaterThan, Value4, Value4]
-  | [GreaterThanOrEqual, Value4, Value4]
-  | [LessThan, Value4, Value4]
-  | [LessThanOrEqual, Value4, Value4]
-  // Arithmetic
-  | [Add, Value4, Value4]
-  | [Subtract, Value4, Value4]
-  | [Multiply, Value4, Value4]
-  | [Divide, Value4, Value4]
-  | [Modulo, Value4, Value4]
-  // Logical
-  | [Not, Value4]
-  | [And, ...Value4[]]
-  | [Or, ...Value4[]]
-  // Conditional
-  | [IfThenElse, Value4, Value4, Value4]
-  // Set
-  | [In, Value4, Value4[]]
-  | [NotIn, Value4, Value4[]]
-  // Value
-  | [Var, string];
+  | [Var, ...string[]];
 
 // tslint:disable-next-line interface-name
 export interface ExecutionContext {
-  [key: string]: Value;
+  [key: string]: any;
 }

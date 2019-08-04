@@ -19,17 +19,19 @@ import {
   Subtract,
   Var,
 } from './operator';
-import { ExecutionContext, Expression, Value, Value4 } from './ts';
+import { ExecutionContext, Expression, Value, Value3 } from './ts';
 
 export const evaluateOperand = (
-  operand: Value4,
+  operand: Value3,
   context: ExecutionContext
 ): Value =>
   isExpression(operand) ? evaluateExpression(operand, context) : operand;
 
-export const evaluateExpression = (
+export const evaluateExpression = <
+  Context extends ExecutionContext = ExecutionContext
+>(
   exp: Expression,
-  context: ExecutionContext
+  context: Context
 ): Value => {
   switch (exp[0]) {
     case Equal: {
@@ -193,7 +195,14 @@ export const evaluateExpression = (
       return true;
     }
     case Var: {
-      return context[exp[1]];
+      let val: any = context[exp[1]];
+      for (let i = 2, len = exp.length; i < len; i += 1) {
+        if (val == null) {
+          return null;
+        }
+        val = val[exp[i]];
+      }
+      return val;
     }
   }
 };
