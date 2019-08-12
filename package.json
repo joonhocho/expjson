@@ -1,6 +1,6 @@
 {
   "name": "expjson",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Super lightweight, fast, and optimized evaluate-able and compilable expressions in JSON written in TypeScript",
   "keywords": [
     "lightweight",
@@ -31,7 +31,7 @@
     "all": "npm run clean && npm run build:index && npm run format && npm run lint:fix && npm run build:all && npm run test",
     "build:all": "npm run build:module && npm run build:node && npm run build:browser",
     "build:browser": "tsc -p ./tsconfig.browser.json && tscpaths -p ./tsconfig.browser.json -s ./src -o ./dist/browser",
-    "build:index": "tstf genIndex -o src/index.ts -w",
+    "build:index": "tstf genIndex -e \"src/deps/**\" -o src/index.ts -w",
     "build:module": "tsc -p ./tsconfig.module.json && tscpaths -p ./tsconfig.module.json -s ./src -o ./lib",
     "build:node": "tsc -p ./tsconfig.node.json && tscpaths -p ./tsconfig.node.json -s ./src -o ./dist/node",
     "clean": "rm -rf ./lib ./dist ./coverage",
@@ -52,9 +52,9 @@
     "tslib": "^1.10.0"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.15",
-    "@types/node": "^12.6.9",
-    "coveralls": "^3.0.4",
+    "@types/jest": "^24.0.17",
+    "@types/node": "^12.7.1",
+    "coveralls": "^3.0.6",
     "jest": "^24.8.0",
     "pre-commit": "^1.2.2",
     "prettier": "^1.18.2",
@@ -68,5 +68,8 @@
   },
   "engines": {
     "node": ">=8.0.0"
+  },
+  "dependencies": {
+    "relationset": "^0.0.3"
   }
 }
