@@ -1,31 +1,30 @@
 // tslint:disable no-console
 import { compileExpression } from './compileExpression';
-import {
-  Add,
-  And,
-  Divide,
-  Equal,
-  GreaterThan,
-  GreaterThanOrEqual,
-  IfThenElse,
-  In,
-  LessThan,
-  LessThanOrEqual,
-  Modulo,
-  Multiply,
-  Not,
-  NotEqual,
-  NotIn,
-  Or,
-  Subtract,
-  Var,
-} from './operator';
+import { Add } from './operators/Add';
+import { And } from './operators/And';
+import { Divide } from './operators/Divide';
+import { Equal } from './operators/Equal';
+import { GreaterThan } from './operators/GreaterThan';
+import { GreaterThanOrEqual } from './operators/GreaterThanOrEqual';
+import { IfThenElse } from './operators/IfThenElse';
+import { In } from './operators/In';
+import { LessThan } from './operators/LessThan';
+import { LessThanOrEqual } from './operators/LessThanOrEqual';
+import { Modulo } from './operators/Modulo';
+import { Multiply } from './operators/Multiply';
+import { Not } from './operators/Not';
+import { NotEqual } from './operators/NotEqual';
+import { NotIn } from './operators/NotIn';
+import { Or } from './operators/Or';
+import { Subtract } from './operators/Subtract';
+import { Var } from './operators/Var';
 
 test('compileExpression', () => {
   expect(compileExpression([Add, 1, 2])({})).toBe(3);
   expect(compileExpression([Add, 2, 1])({})).toBe(3);
-  expect(compileExpression([Add, 2, 1, 4] as any)({})).toBe(3);
-  expect(compileExpression([Add, 2] as any)({})).toBe(NaN);
+  expect(compileExpression([Add, 2, 1, 4])({})).toBe(7);
+  expect(compileExpression([Add] as any)({})).toBe(NaN);
+  expect(compileExpression([Add, 2] as any)({})).toBe(2);
   expect(compileExpression([Add, 2, ''] as any)({})).toBe(NaN);
 });
 
@@ -116,6 +115,7 @@ test('Subtract', () => {
   expect(compileExpression([Subtract, 1, 1])({})).toBe(0);
   expect(compileExpression([Subtract, 1, 2])({})).toBe(-1);
   expect(compileExpression([Subtract, 2, 1])({})).toBe(1);
+  expect(compileExpression([Subtract, 2, 1, 3])({})).toBe(-2);
   expect(compileExpression([Subtract, 1, '1'])({})).toBe(NaN);
 });
 
@@ -148,10 +148,10 @@ test('Not', () => {
 });
 
 test('And', () => {
-  expect(compileExpression([And, 1])({})).toBe(true);
-  expect(compileExpression([And, true])({})).toBe(true);
-  expect(compileExpression([And, 0])({})).toBe(false);
-  expect(compileExpression([And, false])({})).toBe(false);
+  expect(compileExpression([And, 1] as any)({})).toBe(true);
+  expect(compileExpression([And, true] as any)({})).toBe(true);
+  expect(compileExpression([And, 0] as any)({})).toBe(false);
+  expect(compileExpression([And, false] as any)({})).toBe(false);
   expect(compileExpression([And, 1, 1])({})).toBe(true);
   expect(compileExpression([And, 1, 0])({})).toBe(false);
   expect(compileExpression([And, 0, 1])({})).toBe(false);
@@ -163,10 +163,10 @@ test('And', () => {
 });
 
 test('Or', () => {
-  expect(compileExpression([Or, 1])({})).toBe(true);
-  expect(compileExpression([Or, true])({})).toBe(true);
-  expect(compileExpression([Or, 0])({})).toBe(false);
-  expect(compileExpression([Or, false])({})).toBe(false);
+  expect(compileExpression([Or, 1] as any)({})).toBe(true);
+  expect(compileExpression([Or, true] as any)({})).toBe(true);
+  expect(compileExpression([Or, 0] as any)({})).toBe(false);
+  expect(compileExpression([Or, false] as any)({})).toBe(false);
   expect(compileExpression([Or, 1, 1])({})).toBe(true);
   expect(compileExpression([Or, 1, 0])({})).toBe(true);
   expect(compileExpression([Or, 0, 1])({})).toBe(true);

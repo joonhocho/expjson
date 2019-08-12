@@ -1,8 +1,14 @@
-import { Operator, OperatorToName } from './operatorMap';
+import { Operator } from './operator';
+import { OperatorMap } from './operatorMap';
 import { Expression } from './ts';
 
 export const isOperator = (op: unknown): op is Operator =>
-  typeof op === 'string' && OperatorToName.hasOwnProperty(op);
+  typeof op === 'string' && OperatorMap[op] === 1;
+
+const { isArray } = Array;
 
 export const isExpression = (exp: unknown): exp is Expression =>
-  Array.isArray(exp) && isOperator(exp[0]);
+  isArray(exp) && exp.length >= 2 && isOperator(exp[0]);
+
+// tslint:disable-next-line typedef
+export const thunk = (x: any) => () => x;

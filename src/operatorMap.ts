@@ -1,35 +1,24 @@
-import * as Operators from './operator';
+import { Expression, ExpressionCompiler, ExpressionEvaluator } from './ts';
 
-export type OperatorName = keyof typeof Operators;
+export const OperatorMap: { [key: string]: 1 } = {};
 
-export type Operator = (typeof Operators)[OperatorName];
-
-export const OperatorToName: {
-  '==': 'Equal';
-  '!=': 'NotEqual';
-  '>': 'GreaterThan';
-  '>=': 'GreaterThanOrEqual';
-  '<': 'LessThan';
-  '<=': 'LessThanOrEqual';
-  // Arithmetic
-  '+': 'Add';
-  '-': 'Subtract';
-  '*': 'Multiply';
-  '/': 'Divide';
-  '%': 'Modulo';
-  // Logical
-  '!': 'Not';
-  '&&': 'And';
-  '||': 'Or';
-  // Conditional
-  '?:': 'IfThenElse';
-  // Set
-  In: 'In';
-  '!In': 'NotIn';
-  // Variable
-  $: 'Var';
+export const evaluators: {
+  [k in string]: ExpressionEvaluator<any, any>;
 } = {} as any;
 
-Object.keys(Operators).forEach((name: any) => {
-  (OperatorToName as any)[(Operators as any)[name]] = name;
-});
+export const compilers: {
+  [k in string]: ExpressionCompiler<any, any>;
+} = {} as any;
+
+export const registerOperator = <
+  Op extends string,
+  Expr extends Expression = Expression
+>(
+  operator: Op,
+  evaluator: ExpressionEvaluator<Expr>,
+  compiler: ExpressionCompiler<Expr>
+): void => {
+  OperatorMap[operator] = 1;
+  evaluators[operator] = evaluator;
+  compilers[operator] = compiler;
+};
